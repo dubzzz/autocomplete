@@ -229,7 +229,7 @@ export class Option {
               public score: number) {}
 }
 
-export function cur(state: EditorState) { return state.selection.main.head }
+export function cur(state: EditorState) { return state.selection.main.from }
 
 // Make sure the given regexp has a $ at its end and, if `start` is
 // true, a ^ at its start.
