@@ -7,7 +7,8 @@ import {completionPlugin, moveCompletionSelection, acceptCompletion, startComple
 import {baseTheme} from "./theme"
 import {defaultCompletionTooltip} from "./tooltip"
 
-export {snippet, snippetCompletion, nextSnippetField, prevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
+export {snippet, snippetCompletion, nextSnippetField, prevSnippetField,
+        hasNextSnippetField, hasPrevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
 export {Completion, CompletionSection, CompletionContext, CompletionSource, CompletionResult, pickedCompletion,
         completeFromList, ifIn, ifNotIn, insertCompletionText, applyCompletion, Option} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
