@@ -1,7 +1,6 @@
 import {EditorView, ViewUpdate, logException, TooltipView, Rect} from "@codemirror/view"
 import {StateField, EditorState, Facet} from "@codemirror/state"
 import {CompletionState} from "./state"
-import {applyCompletion} from "./view"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, Completion, closeCompletionEffect} from "./completion"
 
@@ -78,7 +77,8 @@ class CompletionTooltip {
   optionClass: (option: Completion) => string
 
   constructor(readonly view: EditorView,
-              readonly stateField: StateField<CompletionState>) {
+              readonly stateField: StateField<CompletionState>,
+              readonly applyCompletion: (view: EditorView, option: Option) => void) {
     let cState = view.state.field(stateField)
     let {options, selected} = cState.open!
     let config = view.state.facet(completionConfig)
@@ -94,7 +94,7 @@ class CompletionTooltip {
     this.dom.addEventListener("mousedown", (e: MouseEvent) => {
       for (let dom = e.target as HTMLElement | null, match; dom && dom != this.dom; dom = dom.parentNode as HTMLElement) {
         if (dom.nodeName == "LI" && (match = /-(\d+)$/.exec(dom.id)) && +match[1] < options.length) {
-          applyCompletion(view, options[+match[1]])
+          this.applyCompletion(view, options[+match[1]])
           e.preventDefault()
           return
         }
@@ -260,12 +260,12 @@ class CompletionTooltip {
   }
 }
 interface CompletionTooltipBuilder {
-  buildCompletionTooltip(stateField: StateField<CompletionState>, view: EditorView): TooltipView;
+  buildCompletionTooltip(stateField: StateField<CompletionState>,  view: EditorView, applyCompletion: (view: EditorView, option: Option) => void): TooltipView;
 }
 
 const defaultTooltipBuilder: CompletionTooltipBuilder = {
-  buildCompletionTooltip: (stateField: StateField<CompletionState>, view: EditorView) =>
-    new CompletionTooltip(view, stateField),
+  buildCompletionTooltip: (stateField: StateField<CompletionState>, view: EditorView, applyCompletion: (view: EditorView, option: Option) => void) =>
+    new CompletionTooltip(view, stateField, applyCompletion),
 };
 export const completionTooltip = Facet.define<CompletionTooltipBuilder, CompletionTooltipBuilder>({
   combine: (values) => (values.length ? values[0] : defaultTooltipBuilder),
