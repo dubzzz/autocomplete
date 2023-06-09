@@ -1,7 +1,7 @@
 import {Prec, Extension, EditorState, StateEffect} from "@codemirror/state"
 import {keymap, KeyBinding} from "@codemirror/view"
 import {Completion, Option} from "./completion"
-import {completionState, State, setSelectedEffect} from "./state"
+import {completionState, State, setSelectedEffect, applyCompletion} from "./state"
 import {CompletionConfig, completionConfig} from "./config"
 import {completionPlugin, moveCompletionSelection, acceptCompletion, startCompletion, closeCompletion} from "./view"
 import {baseTheme} from "./theme"
@@ -9,8 +9,8 @@ import {defaultCompletionTooltip} from "./tooltip"
 
 export {snippet, snippetCompletion, nextSnippetField, prevSnippetField,
         hasNextSnippetField, hasPrevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
-export {Completion, CompletionSection, CompletionContext, CompletionSource, CompletionResult, pickedCompletion,
-        completeFromList, ifIn, ifNotIn, insertCompletionText, applyCompletion, Option} from "./completion"
+export {Completion, CompletionInfo, CompletionSection, CompletionContext, CompletionSource, CompletionResult, 
+        pickedCompletion, completeFromList, ifIn, ifNotIn, insertCompletionText, Option} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
 export {completeAnyWord} from "./word"
 export {CloseBracketConfig, closeBrackets, closeBracketsKeymap, deleteBracketPair, insertBracket} from "./closebrackets"
