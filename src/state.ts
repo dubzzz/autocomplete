@@ -66,9 +66,10 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
 
   let result = [], prev = null
   for (let opt of options) {
-    if (!prev || prev.label != opt.completion.label || prev.detail != opt.completion.detail ||
-        (prev.type != null && opt.completion.type != null && prev.type != opt.completion.type) || 
-        prev.apply != opt.completion.apply) result.push(opt)
+    let cur = opt.completion
+    if (!prev || prev.label != cur.label || prev.detail != cur.detail ||
+        (prev.type != null && cur.type != null && prev.type != cur.type) ||
+        prev.apply != cur.apply || prev.boost != cur.boost) result.push(opt)
     else if (score(opt.completion) > score(prev)) result[result.length - 1] = opt
     prev = opt.completion
   }
