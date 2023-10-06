@@ -95,7 +95,6 @@ class CompletionDialog {
     prev: CompletionDialog | null,
     conf: Required<CompletionConfig>
   ): CompletionDialog | null {
-    const tooltip = state.facet(completionTooltip)
     let options = sortOptions(active, state)
     if (!options.length) {
       return prev && active.some(a => a.state == State.Pending) ?
@@ -112,7 +111,7 @@ class CompletionDialog {
     }
     return new CompletionDialog(options, makeAttrs(id, selected), {
       pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
-      create: view => tooltip.buildCompletionTooltip(completionState, view, applyCompletion),
+      create: createTooltip(state),
       above: conf.aboveCursor,
     }, prev ? prev.timestamp : Date.now(), selected, false)
   }
@@ -340,3 +339,5 @@ export function applyCompletion(view: EditorView, option: Option) {
     apply(view, option.completion, result.from, result.to)
   return true
 }
+
+const createTooltip = (state) => (view) => state.facet(completionTooltip).buildCompletionTooltip(completionState, view, applyCompletion);
