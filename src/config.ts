@@ -79,6 +79,11 @@ export interface CompletionConfig {
   /// When enabled (defaults to true), autocompletion will start
   /// whenever the user move the cursor with arrow keys
   activateOnKeyboardCursorMove?: boolean;
+  /// When there are multiple asynchronous completion sources, this
+  /// controls how long the extension waits for a slow source before
+  /// displaying results from faster sources. Defaults to 100
+  /// milliseconds.
+  updateSyncTime?: number
 }
 
 export const completionConfig = Facet.define<CompletionConfig, Required<CompletionConfig>>({
@@ -98,7 +103,8 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       addToOptions: [],
       positionInfo: defaultPositionInfo as any,
       compareCompletions: (a, b) => a.label.localeCompare(b.label),
-      interactionDelay: 75
+      interactionDelay: 75,
+      updateSyncTime: 100
     }, {
       defaultKeymap: (a, b) => a && b,
       closeOnBlur: (a, b) => a && b,
