@@ -43,6 +43,9 @@ export interface Completion {
   type?: string
   /// The data type of the completion. This is used to pick the icon in case the type is Property
   dataType?: string
+  /// When this option is selected, and one of these characters is
+  /// typed, insert the completion before typing the character.
+  commitCharacters?: readonly string[],
   /// When given, should be a number from -99 to 99 that adjusts how
   /// this completion is ranked compared to other completions that
   /// match the input as well as this one. A negative number moves it
@@ -233,6 +236,10 @@ export interface CompletionResult {
   /// [`validFor`](#autocomplete.CompletionResult.validFor)) that the
   /// completion still applies in the new state.
   update?: (current: CompletionResult, from: number, to: number, context: CompletionContext) => CompletionResult | null
+  /// Set a default set of [commit
+  /// characters](#autocomplete.Completion.commitCharacters) for all
+  /// options in this result.
+  commitCharacters?: readonly string[]
 }
 
 export class Option {

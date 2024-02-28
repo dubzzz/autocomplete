@@ -3,7 +3,8 @@ import {keymap, KeyBinding} from "@codemirror/view"
 import {Completion, Option} from "./completion"
 import {completionState, State, setSelectedEffect} from "./state"
 import {CompletionConfig, completionConfig} from "./config"
-import {completionPlugin, moveCompletionSelection, acceptCompletion, startCompletion, closeCompletion} from "./view"
+import {completionPlugin, moveCompletionSelection, acceptCompletion,
+        startCompletion, closeCompletion, commitCharacters} from "./view"
 import {baseTheme} from "./theme"
 import {defaultCompletionTooltip} from "./tooltip"
 
@@ -20,7 +21,11 @@ export {completionTooltip} from "./tooltip"
 /// Returns an extension that enables autocompletion.
 export function autocompletion(config: CompletionConfig = {}): Extension {
   return [
+<<<<<<< HEAD
     defaultCompletionTooltip,
+=======
+    commitCharacters,
+>>>>>>> 3cc305c (Add support for commit characters)
     completionState,
     completionConfig.of(config),
     completionPlugin,
