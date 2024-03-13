@@ -74,6 +74,11 @@ export interface CompletionConfig {
   /// match score. Defaults to using
   /// [`localeCompare`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare).
   compareCompletions?: (a: Completion, b: Completion) => number
+  /// When set to true (the default is false), turn off fuzzy matching
+  /// of completions and only show those that start with the text the
+  /// user typed. Only takes effect for results where
+  /// [`filter`](#autocomplete.CompletionResult.filter) isn't false.
+  filterStrict?: boolean
   /// By default, commands relating to an open completion only take
   /// effect 75 milliseconds after the completion opened, so that key
   /// presses made before the user is aware of the tooltip don't go to
@@ -109,6 +114,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       icons: true,
       addToOptions: [],
       positionInfo: defaultPositionInfo as any,
+      filterStrict: false,
       compareCompletions: (a, b) => a.label.localeCompare(b.label),
       interactionDelay: 75,
       updateSyncTime: 100
@@ -118,7 +124,8 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       icons: (a, b) => a && b,
       tooltipClass: (a, b) => c => joinClass(a(c), b(c)),
       optionClass: (a, b) => c => joinClass(a(c), b(c)),
-      addToOptions: (a, b) => a.concat(b)
+      addToOptions: (a, b) => a.concat(b),
+      filterStrict: (a, b) => a || b,
     })
   }
 })
