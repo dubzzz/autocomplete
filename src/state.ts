@@ -218,7 +218,11 @@ function cmpOption(a: Option, b: Option) {
 
 export const enum State { Inactive = 0, Pending = 1, Result = 2 }
 
-export function getUserEvent(tr: Transaction): "input" | "delete" | null {
+export function getUserEvent(tr: Transaction, conf: Required<CompletionConfig>): "input" | "delete" | null {
+  if (tr.isUserEvent("input.complete")) {
+    let completion = tr.annotation(pickedCompletion)
+    if (completion && conf.activateOnCompletion(completion)) return "input"
+  }
   return tr.isUserEvent("input.type") ? "input" : tr.isUserEvent("delete.backward") ? "delete" : null
 }
 
@@ -230,7 +234,7 @@ export class ActiveSource {
   hasResult(): this is ActiveResult { return false }
 
   update(tr: Transaction, conf: Required<CompletionConfig>): ActiveSource {
-    let event = getUserEvent(tr), value: ActiveSource = this
+    let event = getUserEvent(tr, conf), value: ActiveSource = this
     if (event)
       value = value.handleUserEvent(tr, event, conf)
     else if (event === 'pointerselection' && conf.activateOnMouseClick)
