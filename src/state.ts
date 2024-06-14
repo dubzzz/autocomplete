@@ -161,7 +161,7 @@ export class CompletionState {
 
   get tooltip(): Tooltip | null { return this.open ? this.open.tooltip : null }
 
-  get attrs() { return this.open ? this.open.attrs : baseAttrs }
+  get attrs() { return this.open ? this.open.attrs : this.active.length ? baseAttrs : noAttrs }
 }
 
 function sameResults(a: readonly ActiveSource[], b: readonly ActiveSource[]) {
@@ -178,6 +178,8 @@ function sameResults(a: readonly ActiveSource[], b: readonly ActiveSource[]) {
 const baseAttrs = {
   "aria-autocomplete": "list"
 }
+
+const noAttrs = {}
 
 function makeAttrs(id: string, selected: number) {
   let result: {[name: string]: string} = {
