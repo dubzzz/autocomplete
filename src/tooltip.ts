@@ -1,5 +1,5 @@
 import {EditorView, ViewUpdate, Direction, logException, TooltipView} from "@codemirror/view"
-import {StateField, EditorState} from "@codemirror/state"
+import {StateField, EditorState, Facet} from "@codemirror/state"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, applyCompletion, Completion} from "./completion"
@@ -234,12 +234,18 @@ class CompletionTooltip {
     return ul
   }
 }
-
-// We allocate a new function instance every time the completion
-// changes to force redrawing/repositioning of the tooltip
-export function completionTooltip(stateField: StateField<CompletionState>) {
-  return (view: EditorView): TooltipView => new CompletionTooltip(view, stateField)
+interface CompletionTooltipBuilder {
+  buildCompletionTooltip(stateField: StateField<CompletionState>, view: EditorView): TooltipView;
 }
+
+const defaultTooltipBuilder: CompletionTooltipBuilder = {
+  buildCompletionTooltip: (stateField: StateField<CompletionState>, view: EditorView) =>
+    new CompletionTooltip(view, stateField),
+};
+export const completionTooltip = Facet.define<CompletionTooltipBuilder, CompletionTooltipBuilder>({
+  combine: (values) => (values.length ? values[0] : defaultTooltipBuilder),
+});
+export const defaultCompletionTooltip = completionTooltip.of(defaultTooltipBuilder);
 
 function scrollIntoView(container: HTMLElement, element: HTMLElement) {
   let parent = container.getBoundingClientRect()

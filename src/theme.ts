@@ -10,11 +10,11 @@ export const baseTheme = EditorView.baseTheme({
       overflow: "hidden auto",
       maxWidth_fallback: "700px",
       maxWidth: "min(700px, 95vw)",
-      minWidth: "250px",
       maxHeight: "10em",
       listStyle: "none",
       margin: 0,
       padding: 0,
+      boxSizing: "border-box",
 
       "& > li": {
         overflowX: "hidden",
@@ -23,17 +23,14 @@ export const baseTheme = EditorView.baseTheme({
         padding: "1px 3px",
         lineHeight: 1.2
       },
-    }
-  },
 
-  "&light .cm-tooltip-autocomplete ul li[aria-selected]": {
-    background: "#17c",
-    color: "white",
-  },
-
-  "&dark .cm-tooltip-autocomplete ul li[aria-selected]": {
-    background: "#347",
-    color: "white",
+      "& > li[aria-selected]": {
+        background_fallback: "#bdf",
+        backgroundColor: "Highlight",
+        color_fallback: "white",
+        color: "HighlightText"
+      },
+    },
   },
 
   ".cm-completionListIncompleteTop:before, .cm-completionListIncompleteBottom:after": {
@@ -47,8 +44,7 @@ export const baseTheme = EditorView.baseTheme({
     position: "absolute",
     padding: "3px 9px",
     width: "max-content",
-    maxWidth: `${Info.Width}px`,
-    boxSizing: "border-box"
+    maxWidth: "300px"
   },
 
   ".cm-completionInfo.cm-completionInfo-left": { right: "100%" },

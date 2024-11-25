@@ -6,6 +6,8 @@ import {FuzzyMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
 
+const MaxOptions = 300
+
 // Used to pick a preferred option when two options with the same
 // label occur in the result.
 function score(option: Completion) {
@@ -31,9 +33,19 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
       }
     }
   }
+
+  const config = state.facet(completionConfig);
+  if (config.optionFilterAndSort) {
+    options = config.optionFilterAndSort(options);
+  } else {
+    options.sort(cmpOption);
+  }
+
   let result = [], prev = null
-  let compare = state.facet(completionConfig).compareCompletions
-  for (let opt of options.sort((a, b) => (b.match[0] - a.match[0]) || compare(a.completion, b.completion))) {
+  for (let opt of options) {
+    if (result.length == MaxOptions) {
+      break;
+    }
     if (!prev || prev.label != opt.completion.label || prev.detail != opt.completion.detail ||
         (prev.type != null && opt.completion.type != null && prev.type != opt.completion.type) || 
         prev.apply != opt.completion.apply) result.push(opt)
@@ -62,21 +74,23 @@ class CompletionDialog {
     prev: CompletionDialog | null,
     conf: Required<CompletionConfig>
   ): CompletionDialog | null {
+    const tooltip = state.facet(completionTooltip)
     let options = sortOptions(active, state)
     if (!options.length) return null
     let selected = state.facet(completionConfig).selectOnOpen ? 0 : -1
     if (prev && prev.selected != selected && prev.selected != -1) {
       let selectedValue = prev.options[prev.selected].completion
-      for (let i = 0; i < options.length; i++) if (options[i].completion == selectedValue) {
-        selected = i
-        break
+      for (let i = 0; i < options.length && !selected; i++) {
+        if (options[i].completion == selectedValue) {
+          selected = i;
+        }
       }
     }
     return new CompletionDialog(options, makeAttrs(id, selected), {
-      pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
-      create: completionTooltip(completionState),
+        pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
+        create: view => tooltip.buildCompletionTooltip(completionState, view),
       above: conf.aboveCursor,
-    }, prev ? prev.timestamp : Date.now(), selected)
+      }, prev ? prev.timestamp : Date.now(), selected)
   }
 
   map(changes: ChangeDesc) {
@@ -146,6 +160,31 @@ function makeAttrs(id: string, selected: number) {
 }
 
 const none: readonly any[] = []
+const collatorWithNumeric = new Intl.Collator(undefined, { numeric: true })
+const collator = new Intl.Collator()
+
+function compareStrings(stringA: string | undefined, stringB: string | undefined): number {
+  if (stringA === undefined && stringB === undefined) {
+    return 0;
+  }
+  if (stringA === undefined) {
+    return -1;
+  }
+  if (stringB === undefined) {
+    return 1;
+  }
+
+  const comparisonResultWithNumeric = collatorWithNumeric.compare(stringA, stringB);
+  return comparisonResultWithNumeric === 0 ? collator.compare(stringA, stringB) : comparisonResultWithNumeric;
+}
+
+function cmpOption(a: Option, b: Option) {
+  let dScore = b.match[0] - a.match[0];
+  if (dScore) {
+    return dScore;
+  }
+  return compareStrings(a.completion.label, b.completion.label);
+}
 
 export const enum State { Inactive = 0, Pending = 1, Result = 2 }
 
@@ -164,6 +203,10 @@ export class ActiveSource {
     let event = getUserEvent(tr), value: ActiveSource = this
     if (event)
       value = value.handleUserEvent(tr, event, conf)
+    else if (event === 'pointerselection' && conf.activateOnMouseClick)
+      value = new ActiveSource(this.source, State.Pending)
+    else if (event === 'keyboardselection' && conf.activateOnKeyboardCursorMove)
+      value = new ActiveSource(this.source, State.Pending)
     else if (tr.docChanged)
       value = value.handleChange(tr)
     else if (tr.selection && value.state != State.Inactive)
@@ -252,6 +295,9 @@ export const completionState = StateField.define<CompletionState>({
 
   provide: f => [
     showTooltip.from(f, val => val.tooltip),
-    EditorView.contentAttributes.from(f, state => state.attrs)
+    EditorView.contentAttributes.from(f, state => state.attrs),
+    // Disable Grammarly for the formula bar messing with the scrollbars.
+    // Source: https://discuss.codemirror.net/t/codemirror6-and-grammarly/3917/2
+    EditorView.contentAttributes.of({ 'data-enable-grammarly': 'false' }),
   ]
 })
