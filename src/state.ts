@@ -32,11 +32,12 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
     }
   }
 
-  const config = state.facet(completionConfig);
-  if (config.optionFilterAndSort) {
-    options = config.optionFilterAndSort(options);
+  const filterAndSort = state.facet(completionConfig).optionFilterAndSort;
+  if (filterAndSort) {
+    options = filterAndSort(options);
   } else {
-    options.sort(cmpOption);
+    let compare = state.facet(completionConfig).compareCompletions;
+    options.sort((a, b) => b.match[0] - a.match[0] || compare(a.completion, b.completion));
   }
 
   let result = [], prev = null
