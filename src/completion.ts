@@ -6,6 +6,8 @@ import {ActiveResult} from "./state"
 
 /// Objects type used to represent individual completions.
 export interface Completion {
+  /// Optional source Application to be displayed before the label, with a different style
+  sourceApp?: string
   /// The label to show in the completion picker. This is what input
   /// is matched agains to determine whether a completion matches (and
   /// how well it matches).
@@ -35,6 +37,8 @@ export interface Completion {
   ///
   /// Multiple types can be provided by separating them with spaces.
   type?: string
+  /// The data type of the completion. This is used to pick the icon in case the type is Property
+  dataType?: string
   /// When given, should be a number from -99 to 99 that adjusts how
   /// this completion is ranked compared to other completions that
   /// match the input as well as this one. A negative number moves it
@@ -216,23 +220,26 @@ export const pickedCompletion = Annotation.define<Completion>()
 /// completion's text in the main selection range, and any other
 /// selection range that has the same text in front of it.
 export function insertCompletionText(state: EditorState, text: string, from: number, to: number): TransactionSpec {
+  const { main } = state.selection,
+    fromOff = from - main.from,
+    toOff = to - main.from;
   return {
     ...state.changeByRange(range => {
-      if (range == state.selection.main) return {
-        changes: {from: from, to: to, insert: text},
-        range: EditorSelection.cursor(from + text.length)
-      }
-      let len = to - from
-      if (!range.empty ||
-        len && state.sliceDoc(range.from - len, range.from) != state.sliceDoc(from, to))
+      if (
+        range != main &&
+        from != to &&
+        state.sliceDoc(range.from + fromOff, range.from + toOff) != state.sliceDoc(from, to)
+      ) {
         return {range}
+      }
       return {
-        changes: {from: range.from - len, to: range.from, insert: text},
-        range: EditorSelection.cursor(range.from - len + text.length)
+        changes: {from: range.from + fromOff, to: to == main.from ? range.to : range.from + toOff, insert: text},
+        range: EditorSelection.cursor(range.from + fromOff + text.length)
       }
     }),
-    userEvent: "input.complete"
-  }
+    scrollIntoView: true,
+    userEvent: "input.complete",
+  };
 }
 
 export function applyCompletion(view: EditorView, option: Option) {

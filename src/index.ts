@@ -5,17 +5,21 @@ import {completionState, State, setSelectedEffect} from "./state"
 import {CompletionConfig, completionConfig} from "./config"
 import {completionPlugin, moveCompletionSelection, acceptCompletion, startCompletion, closeCompletion} from "./view"
 import {baseTheme} from "./theme"
+import {defaultCompletionTooltip} from "./tooltip"
 
 export {snippet, snippetCompletion, nextSnippetField, prevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
 export {Completion, CompletionContext, CompletionSource, CompletionResult, pickedCompletion,
-        completeFromList, ifIn, ifNotIn, insertCompletionText} from "./completion"
+        completeFromList, ifIn, ifNotIn, insertCompletionText, applyCompletion, Option} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
 export {completeAnyWord} from "./word"
 export {CloseBracketConfig, closeBrackets, closeBracketsKeymap, deleteBracketPair, insertBracket} from "./closebrackets"
+export {CompletionState} from "./state"
+export {completionTooltip} from "./tooltip"
 
 /// Returns an extension that enables autocompletion.
 export function autocompletion(config: CompletionConfig = {}): Extension {
   return [
+    defaultCompletionTooltip,
     completionState,
     completionConfig.of(config),
     completionPlugin,
@@ -40,7 +44,8 @@ export const completionKeymap: readonly KeyBinding[] = [
   {key: "ArrowUp", run: moveCompletionSelection(false)},
   {key: "PageDown", run: moveCompletionSelection(true, "page")},
   {key: "PageUp", run: moveCompletionSelection(false, "page")},
-  {key: "Enter", run: acceptCompletion}
+  {key: "Enter", run: acceptCompletion},
+  {key: "Tab", run: acceptCompletion}
 ]
 
 const completionKeymapExt = Prec.highest(keymap.computeN([completionConfig], state => 
