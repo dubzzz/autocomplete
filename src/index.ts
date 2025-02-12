@@ -9,7 +9,7 @@ import {defaultCompletionTooltip} from "./tooltip"
 
 export {snippet, snippetCompletion, nextSnippetField, prevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
 export {Completion, CompletionSection, CompletionContext, CompletionSource, CompletionResult, pickedCompletion,
-        completeFromList, ifIn, ifNotIn, insertCompletionText} from "./completion"
+        completeFromList, ifIn, ifNotIn, insertCompletionText, applyCompletion, Option} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
 export {completeAnyWord} from "./word"
 export {CloseBracketConfig, closeBrackets, closeBracketsKeymap, deleteBracketPair, insertBracket} from "./closebrackets"
