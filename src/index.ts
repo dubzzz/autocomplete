@@ -1,7 +1,7 @@
 import {Prec, Extension, EditorState, StateEffect} from "@codemirror/state"
 import {keymap, KeyBinding} from "@codemirror/view"
 import {Completion, Option} from "./completion"
-import {completionState, State, setSelectedEffect, applyCompletion} from "./state"
+import {completionState, State, setSelectedEffect} from "./state"
 import {CompletionConfig, completionConfig} from "./config"
 import {completionPlugin, moveCompletionSelection, acceptCompletion, startCompletion, closeCompletion} from "./view"
 import {baseTheme} from "./theme"
@@ -14,7 +14,7 @@ export {Completion, CompletionInfo, CompletionSection, CompletionContext, Comple
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
 export {completeAnyWord} from "./word"
 export {CloseBracketConfig, closeBrackets, closeBracketsKeymap, deleteBracketPair, insertBracket} from "./closebrackets"
-export {CompletionState} from "./state"
+export { CompletionState, applyCompletion } from "./state";
 export {completionTooltip} from "./tooltip"
 
 /// Returns an extension that enables autocompletion.
