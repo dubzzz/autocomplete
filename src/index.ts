@@ -21,11 +21,8 @@ export {completionTooltip} from "./tooltip"
 /// Returns an extension that enables autocompletion.
 export function autocompletion(config: CompletionConfig = {}): Extension {
   return [
-<<<<<<< HEAD
     defaultCompletionTooltip,
-=======
     commitCharacters,
->>>>>>> 3cc305c (Add support for commit characters)
     completionState,
     completionConfig.of(config),
     completionPlugin,
